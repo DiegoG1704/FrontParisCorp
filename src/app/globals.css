@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+/* Estilos para personalizar la barra de desplazamiento */
+::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra de desplazamiento */
+}
+
+::-webkit-scrollbar-track {
+  background: #928f8f; /* Color de fondo del track */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(255, 255, 255); /* Color de la barra de desplazamiento (azul) */
+  border-radius: 10px; /* Bordes redondeados */
+  border: 0.5px solid #928f8f; /* Borde de la barra de desplazamiento */
+}
+
+.p-accordion .p-accordion-header .p-accordion-header-link {
+  background: #838485;
+  color: #ededed;
+  font-weight: 200;
+  font-size: 15px;
+}
+
+.p-accordion .p-accordion-content {
+  background: #5f6570;
+  color: #ffffff;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}

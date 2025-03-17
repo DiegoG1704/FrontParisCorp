@@ -1,0 +1,152 @@
+/* Contenedor principal con diseño más limpio */
+.containerAplicacion {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  background-color: #2c2f36;
+}
+
+/* Contenedor del video */
+.video-container {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+  height: auto;
+  text-align: center;
+}
+
+/* Encabezado del video */
+.video-header {
+  background-color: #1f1f1f;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.video-header h1 {
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Video estilizado */
+.video-container video {
+  width: 100%;
+  max-width: 900px;
+  margin: 1rem auto;
+  border-radius: 12px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Descripción del video */
+.video-description {
+  background-color: #e4e4e4;
+  color: #333;
+  padding: 1.5rem;
+  text-align: left;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  font-size: 1rem;
+}
+
+/* Contenedor de módulos */
+.modules-container {
+  background-color: #2c2f36;
+  width: 30%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  overflow-y: auto;
+  border-left: 4px solid #6366f1;
+}
+
+/* Encabezado de módulos */
+.modules-header {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+/* Contenedor del acordeón */
+.accordion-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 1.5rem;
+}
+
+.accordion-tab {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background-color: #3c3f47;
+  border-radius: 8px;
+  transition: background 0.3s ease-in-out;
+}
+
+.accordion-tab:hover {
+  background-color: #4b4f58;
+}
+
+.accordion-tab a {
+  color: white;
+  font-size: 1rem;
+  padding-left: 10px;
+  text-decoration: none;
+  transition: color 0.3s ease-in-out;
+}
+
+.accordion-tab a:hover {
+  color: #6366f1;
+}
+
+.accordion-tab .tag {
+  background-color: #10b981;
+  color: white;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+}
+
+/* Botón de regreso */
+.back-button {
+  width: 100%;
+  padding: 1rem;
+  background-color: #6366f1;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.back-button:hover {
+  background-color: #4f51d4;
+}
+
+/* Diseño responsivo */
+@media (max-width: 1024px) {
+  .containerAplicacion {
+      flex-direction: column;
+  }
+
+  .video-container {
+      width: 100%;
+      padding: 1rem;
+  }
+
+  .modules-container {
+      width: 100%;
+      padding: 1rem;
+      border-left: none;
+      border-top: 4px solid #6366f1;
+      overflow-y:unset;
+  }
+}
