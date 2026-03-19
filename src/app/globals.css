@@ -1,4 +1,4 @@
-@tailwind base;
+/* @tailwind base; */
 @tailwind components;
 @tailwind utilities;
 
@@ -15,9 +15,9 @@
 }
 
 /* Estilos para personalizar la barra de desplazamiento */
-::-webkit-scrollbar {
-  width: 8px; /* Ancho de la barra de desplazamiento */
-}
+/* ::-webkit-scrollbar {
+  width: 8px; 
+} */
 
 ::-webkit-scrollbar-track {
   background: #928f8f; /* Color de fondo del track */
@@ -46,3 +46,24 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.p-dialog .p-dialog-content,
+.p-dialog .p-dialog-header,
+.p-dialog .p-dialog-footer{
+  background: #E8F4DF!important;
+}
+
+.p-datatable .p-datatable-thead > tr > th{
+  background: #d8e5ee !important;
+  /* border-left: 2px solid #4F9CD7 !important;
+  border-bottom: 1px solid white !important; */
+}
+
+.p-dialog .p-dialog-header .p-dialog-header-icon {
+  color: #BACD00 !important;
+}
+
+/* .p-datatable .p-datatable-tbody > tr > td {
+  border-left: 2px solid #4F9CD7 !important;
+  border-bottom: 1px solid white !important;
+} */

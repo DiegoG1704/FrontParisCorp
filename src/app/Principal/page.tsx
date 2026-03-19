@@ -1,157 +1,241 @@
 'use client'
 
-import { useRouter } from 'next/navigation';
-import { Button } from 'primereact/button';
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useAppContext } from '../Provider/AppContext';
-import { Tag } from 'primereact/tag';
-import { Accordion, AccordionTab } from 'primereact/accordion';
-import { ProgressSpinner } from 'primereact/progressspinner';
+import { InputText } from 'primereact/inputtext';
+import { Button } from 'primereact/button';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 import './styles/styles.css'
+import Link from 'next/link';
+import DialogDetalles from '../Components/DialogDetalles';; // 👈 importa el tipo correcto
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { Toast } from 'primereact/toast';
+import { useProduccionContext } from '../Provider/AppContextProducc';
 
 export default function Page() {
-  const {listProductos} = useAppContext();
-  const router = useRouter();
+  const [visible,setVisible]=useState(false)
+  const {produccion,setSelectPrenda} = useAppContext();
+  const {Produccion}=useProduccionContext();
 
-  // Asegúrate de que el primer video esté seleccionado por defecto al cargar la página
-  const [loading, setLoading] = useState(true);
-  const [selectedVideo, setSelectedVideo] = useState<string | undefined>(listProductos?.[0]?.clases?.[0]?.video);
-  const [selectedDescripcion, setSelectedDescripcion] = useState<string | undefined>(listProductos?.[0]?.clases?.[0]?.descripcion);
-  const [selectedTitle, setSelectedTitle] = useState<string | undefined>(listProductos?.[0]?.clases?.[0]?.titulo);
-  const [selectedModulo, setSelectedModulo] = useState<string | undefined>(listProductos?.[0]?.titulo); // Nuevo estado para el módulo
-  const [selectedModuloTitulo, setSelectedModuloTitulo] = useState<string | undefined>(listProductos?.[0]?.descripcion);
-  const [selectedDuracion, setSelectedDuracion] = useState<string | undefined>(listProductos?.[0]?.clases?.[0]?.duracion);
+ // Devuelve el nombre del estado con estilo de color
+  const getNombreEstado = (id: string | number) => {
+    const estadoMap: { [key: number]: { nombre: string; color: string; icon: string } } = {
+      1: { nombre: 'Sin Iniciar', color: 'bg-gray-500', icon: 'pi pi-clock' },
+      2: { nombre: 'En Proceso', color: 'bg-blue-500', icon: 'pi pi-spinner' },
+      3: { nombre: 'Pausado', color: 'bg-yellow-500', icon: 'pi pi-pause' },
+      4: { nombre: 'Suspendido', color: 'bg-red-500', icon: 'pi pi-check' },
+      5: { nombre: 'Finalizado', color: 'bg-green-500', icon: 'pi pi-check' },
+    };
 
-  useEffect(() => {
-    const authToken = localStorage.getItem("authToken");
+    const estadoId = parseInt(id as string);
+    const estado = estadoMap[estadoId];
 
-    if (!authToken) {
-      router.push("/"); // Redirige si no hay sesión activa
-      return;
-    }
-
-    // Simulación de carga de 3 segundos
-    setTimeout(() => {
-      setLoading(false);
-    }, 3000);
-  }, [router]);
-
-  useEffect(() => {
-    if (listProductos.length > 0 && listProductos[0].clases.length > 0) {
-      setSelectedVideo(listProductos[0].clases[0].video);
-      setSelectedTitle(listProductos[0].clases[0].titulo);
-      setSelectedDescripcion(listProductos[0].clases[0].descripcion);
-      setSelectedModulo(listProductos[0].titulo);
-      setSelectedModuloTitulo(listProductos[0].descripcion);
-      setSelectedDuracion(listProductos[0].clases[0].duracion);
-    }
-  }, [listProductos]);
-
-  if (loading) {
     return (
-      <div className="flex flex-col bg-[#2c2f36] justify-center items-center h-screen">
-        <ProgressSpinner style={{width: '150px', height: '150px'}}/>
-        <h1 className='text-white text-[2rem]'>Cargando tu curso...</h1>
-      </div>
-      )
-  }
-  // Función para manejar el clic en el título de la clase y actualizar el video
-  const handleClassClick = (videoUrl: string, titulo: string, descripcion: string, moduloTitulo: string, moduloDescripcion: string,duracion:string) => {
-    setSelectedVideo(videoUrl); // Actualiza el video seleccionado
-    setSelectedTitle(titulo); // Actualiza el título de la clase seleccionada
-    setSelectedDescripcion(descripcion);
-    setSelectedModulo(moduloTitulo); // Actualiza el módulo seleccionado
-    setSelectedModuloTitulo(moduloDescripcion)
-    setSelectedDuracion(duracion)
+      <span
+        className={`inline-flex items-center gap-2 ${estado?.color || 'bg-black'} text-white px-3 
+        py-1 rounded-full shadow-sm text-[1rem] font-medium`}
+      >
+        <i className={estado?.icon || 'pi pi-question'}></i>
+        {estado?.nombre || 'Desconocido'}
+      </span>
+    );
+  };
+
+  // Devuelve el nombre del área con estilo de color
+  const getNombreArea = (id: string | number) => {
+    const areaMap: { [key: number]: { nombre: string; color: string; icon: string } } = {
+      1: { nombre: 'Sin Iniciar', color: 'bg-gray-400', icon: 'pi pi-clock' },
+      2: { nombre: 'Corte', color: 'bg-purple-500', icon: 'pi pi-scissors' },
+      3: { nombre: 'Confección', color: 'bg-orange-500', icon: 'pi pi-pencil' },
+      4: { nombre: 'Acabados', color: 'bg-blue-400', icon: 'pi pi-palette' },
+      5: { nombre: 'Finalizado', color: 'bg-green-600', icon: 'pi pi-check-circle' },
+    };
+
+    const areaId = parseInt(id as string);
+    const area = areaMap[areaId];
+
+    return (
+      <span
+        className={`inline-flex items-center gap-2 ${area?.color || 'bg-black'} text-white px-3 
+        py-1 rounded-full shadow-sm text-[1rem] font-medium`}
+      >
+        <i className={area?.icon || 'pi pi-question'}></i>
+        {area?.nombre || 'Desconocido'}
+      </span>
+    );
+  };
+
+
+  const Detalles = (rowData:any)=>{
+    return(
+      <Button 
+      icon='pi pi-clipboard'
+      className='bg-white border-[#27D733] text-[#27D733] rounded-[30px]'
+      onClick={()=>{setVisible(true),setSelectPrenda(rowData)}}
+      />
+    )
   }
 
-  const submit = () => {
-    // Eliminar el 'authToken' del localStorage
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('username');
-    
-    // Redirigir a la página de inicio o la página deseada
-    router.push('/');
+  const toast = useRef<Toast>(null);
+
+  const acceptIniciar = async (rowData: any) => {
+    await Produccion(2, 2);
+    toast.current?.show({ severity: 'success', summary: 'Producción Iniciada', detail: `Lote Iniciado`, life: 3000 });
   };
-  
+
+  const acceptPausar = async (rowData: any) => {
+    await Produccion(rowData.area, 3);
+    toast.current?.show({ severity: 'success', summary: 'Producción Pausada', detail: `Lote Pausado`, life: 3000 });
+  };
+
+  const acceptSuspendido = async (rowData: any) => {
+    await Produccion(rowData.area, 4);
+    toast.current?.show({ severity: 'success', summary: 'Producción Suspendida', detail: `Lote Suspendido`, life: 3000 });
+  };
+
+  const acceptReiniciar = async (rowData: any) => {
+    await Produccion(rowData.area, 2);
+    toast.current?.show({ severity: 'success', summary: 'Producción Reiniciada', detail: `Lote Reanudado`, life: 3000 });
+  };
+
+
+  const reject = () => {
+      toast.current?.show({ severity: 'warn', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+  }
+
+  const confirmPlay = (rowData: any) => {
+    confirmDialog({
+      message: '¿Desea Iniciar la Producción de este Lote?',
+      header: 'Confirmación',
+      icon: 'pi pi-exclamation-triangle',
+      defaultFocus: 'accept',
+      accept: () => acceptIniciar(rowData),
+      reject,
+    });
+  };
+
+  const confirmStop = (rowData: any) => {
+    confirmDialog({
+      message: '¿Desea Pausar la Producción de este Lote?',
+      header: 'Confirmación',
+      icon: 'pi pi-exclamation-triangle',
+      defaultFocus: 'accept',
+      accept: () => acceptPausar(rowData),
+      reject
+    });
+  };
+
+  const confirmDelete = (rowData: any) => {
+    confirmDialog({
+      message: '¿Desea Suspender la Producción de este Lote?',
+      header: 'Confirmación',
+      icon: 'pi pi-exclamation-triangle',
+      defaultFocus: 'accept',
+      accept: () => acceptSuspendido(rowData),
+      reject
+    });
+  };
+
+  const confirmReiniciar = (rowData: any) => {
+    confirmDialog({
+      message: '¿Desea Reiniciar la Producción de este Lote?',
+      header: 'Confirmación',
+      icon: 'pi pi-exclamation-triangle',
+      defaultFocus: 'accept',
+      accept: () => acceptReiniciar(rowData),
+      reject
+    });
+  };
+
+  const Acciones = (rowData: any) => {
+    const estado = parseInt(rowData.estado);
+
+      return (
+        <div className="flex gap-2">
+          {estado === 1 && (
+            <Button
+              onClick={()=>{confirmPlay(rowData),setSelectPrenda(rowData)}}
+              icon="pi pi-play"
+              className="bg-white border-green-500 text-green-500 rounded-full"
+              tooltip="Iniciar Producción"
+              tooltipOptions={{ position: 'top' }}
+            />
+          )}
+          {estado === 2 && (
+            <>
+              <Button
+                onClick={()=>{confirmStop(rowData),setSelectPrenda(rowData)}}
+                icon="pi pi-pause"
+                className="bg-white border-yellow-500 text-yellow-500 rounded-full"
+                tooltip="Pausar Producción"
+                tooltipOptions={{ position: 'top' }}
+              />
+              <Button
+                onClick={()=>{confirmDelete(rowData),setSelectPrenda(rowData)}}
+                icon="pi pi-times"
+                className="bg-white border-red-500 text-red-500 rounded-full"
+                tooltip="Suspender Producción"
+                tooltipOptions={{ position: 'top' }}
+              />
+            </>
+          )}
+          {estado === 3 && (
+            <>
+              <Button
+                onClick={()=>{confirmReiniciar(rowData),setSelectPrenda(rowData)}}
+                icon="pi pi-play"
+                className="bg-white border-green-500 text-green-500 rounded-full"
+                tooltip="Reanudar Producción"
+                tooltipOptions={{ position: 'top' }}
+              />
+              <Button
+                onClick={()=>{confirmDelete(rowData),setSelectPrenda(rowData)}}
+                icon="pi pi-times"
+                className="bg-white border-red-500 text-red-500 rounded-full"
+                tooltip="Suspender Producción"
+                tooltipOptions={{ position: 'top' }}
+              />
+            </>
+          )}
+        </div>
+      );
+    };
 
   return (
-    <div className="containerAplicacion">
-      {/* Contenedor para el video */}
-      {loading ? (
-        <div className="flex bg-white justify-center items-center h-screen">
-          <ProgressSpinner />
-        </div>
-      ) : (
-        <>
-      <div className="video-container">
-        <div className="video-header">
-          <h1>{selectedTitle}</h1>
-          {selectedVideo && (
-            <video controls className="video-player">
-              <source src={selectedVideo} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          )}
-          <div className="video-description p-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-bold text-xl md:text-2xl">{selectedModulo}</span>
-              <span className="bg-[#525252] text-white px-3 py-1 rounded-md text-xs md:text-sm">
-                {selectedDuracion}
-              </span>
-            </div>
-            <span className="block text-sm md:text-base text-gray-700">{selectedModuloTitulo}</span>
-            <span className="block font-bold text-lg md:text-xl text-gray-900 mt-2">
-              {selectedTitle}
-            </span>
-            <span className="block text-sm md:text-base text-gray-600 mt-1">
-              {selectedDescripcion}
-            </span>
-          </div>
-
+    <div className="flex flex-col p-10">
+      <Toast ref={toast} />
+      <ConfirmDialog />
+      <strong className='text-[40px] text-black'>Lista de Produccion</strong>
+      <span className='text-[20px] text-black pt-4'>En este módulo usted podrá ver la lista de produccion </span>
+      <div className='flex mt-20 justify-between'>
+        <InputText placeholder='Buscar...' className='h-12 w-[30rem]'/>
+        <div className='flex'>
+          <Button icon='pi pi-file-excel' label='Exportar Excel' className='text-[#4F9CD7] bg-[white] border-[#4F9CD7] mr-2'/>
+          <Button icon='pi pi-plus' className='bg-[#BACD00] text-[white] border-[#BACD00]'>
+            <Link href={'/Principal/Page/CrearProduccion'} className='text-white duration-200 no-underline'><span>Iniciar Produccion</span></Link>
+          </Button>
         </div>
       </div>
-
-      {/* Contenedor para el acordeón y el botón */}
-      <div className="modules-container">
-        <h2 className="modules-header">Blockchain</h2>
-        
-        {/* Accordion con clases */}
-        <div className="accordion-container">
-          <Accordion multiple activeIndex={0}>
-            {listProductos.map((modulo, index) => (
-              <AccordionTab key={index} header={modulo.titulo}>
-                {modulo?.clases?.map((clase, claseIndex) => (
-                  <div key={claseIndex} className="accordion-tab">
-                    <div>
-                    <i
-                      className={`pi pi-play-circle ${clase?.completado ? 'text-green-500' : 'text-white'}`}
-                    />
-                      <a
-                        href="#"
-                        onClick={() => handleClassClick(clase.video, clase.titulo, clase.descripcion, modulo.titulo, modulo.descripcion, clase.duracion)}
-                        className="accordion-link"
-                      >
-                        {clase?.titulo}
-                      </a>
-                    </div>
-                    <Tag severity="success" value="10 puntos"></Tag>
-                  </div>
-                ))}
-              </AccordionTab>
-            ))}
-          </Accordion>
-        </div>
-
-        {/* Botón de regreso */}
-        <Button
-          label="Regresar"
-          onClick={submit}
-          className="back-button"
-        />
+      <div className="card mt-6">
+        <DataTable
+          value={produccion}
+          tableStyle={{ minWidth: '50rem' }}
+          className="tabla-punteada"
+          paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]}
+        >
+          <Column field="codigoProduccion" header="Codigo" />
+          <Column field="nombreModelo" header="Modelo" />
+          <Column field="cantidad" header="Cantidad Proyectada" />
+          <Column field="fecha" header="Fecha de Inicio" />
+          <Column header="Área" body={(rowData) => getNombreArea(rowData.area)} />
+          <Column header="Estado" body={(rowData) => getNombreEstado(rowData.estado)} />
+          <Column field="quantity" header="Fecha Fin" />
+          <Column body={(rowData)=>Detalles(rowData)} header="Detalle" />
+          <Column body={(rowData) => Acciones(rowData)} header="Acciones" />
+        </DataTable>
       </div>
-      </>
-      )}
+      <DialogDetalles Open={visible} Close={()=>setVisible(false)}/>
     </div>
   );
 }
