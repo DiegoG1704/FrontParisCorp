@@ -12,13 +12,14 @@ import DialogEdit from './Components/DialogEdit'
 import { Toast } from 'primereact/toast'
 
 export default function PageClientes() {
-  const { clientes, ListaClientes } = useAppContext()
+  const { clientes, ListaClientes, usuario } = useAppContext()
 
   const [visible, setVisible] = useState(false)
   const [visibleDelete, setVisibleDelete] = useState(false)
   const [visibleEdit, setVisibleEdit] = useState(false)
   const [select, setSelect] = useState<any>(null)
-
+  const user = usuario?.datosUsuario;
+  const isDark = user?.estadoModo !== "1";
   // estado del buscador
   const [busqueda, setBusqueda] = useState('')
   const toast = useRef<Toast>(null);
@@ -97,13 +98,13 @@ export default function PageClientes() {
   )
 
   return (
-    <div className="flex flex-col p-10 bg-gray-50 min-h-screen">
+    <div className={`flex flex-col p-10 ${isDark ? "bg-[#0F172A] text-white" : "bg-gray-50 text-black"}`}>
       <Toast ref={toast} />
       <h1 className="text-[40px] text-[#4F9CD7] font-bold">
         Gestión de Cliente
       </h1>
 
-      <p className="text-[18px] text-gray-700 mt-2">
+      <p className={`text-[20px] pt-4 ${isDark ? "text-gray-300" : "text-black"}`}>
         En este módulo se gestionan los clientes registrados en el sistema.
       </p>
 
@@ -114,7 +115,7 @@ export default function PageClientes() {
           <i className="pi pi-search" />
           <InputText
             placeholder="Buscar por nombre o DNI..."
-            className="h-12 w-full"
+            className={`h-12 w-[30rem] ${isDark ? "bg-[#1E293B] text-white border-gray-600" : "bg-white text-black"}`}
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
           />
@@ -122,7 +123,7 @@ export default function PageClientes() {
         <div>
           <Button 
             icon='pi pi-refresh'
-            className="mr-2 bg-transparent border-transparent text-[#BACD00]"
+            className={`mr-2 bg-transparent border-transparent ${isDark ? "text-[#4F9CD7]":"text-[#BACD00]" }`}
             tooltip="Actualizar lista"
             tooltipOptions={{ position: 'top' }}
             onClick={handleRefresh}

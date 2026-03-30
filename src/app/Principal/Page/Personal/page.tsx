@@ -14,13 +14,15 @@ import DialogEdit from './Components/DialogEdit'
 import { Toast } from 'primereact/toast'
 
 export default function Page() {
-  const {personal, ListaPersonal}=useAppContext();
+  const {personal, ListaPersonal, usuario}=useAppContext();
   const[visible,setVisible]=useState(false)
   const[visibleEdit,setVisibleEdit]=useState(false)
   const[visibleDetalles,setVisibleDetalles]=useState(false)
   const[visibleAgregar,setVisibleAgregar]=useState(false)
   const[visibleDelete,setVisibleDelete]=useState(false)
   const[select,setSelect]=useState([])
+  const user = usuario?.datosUsuario;
+  const isDark = user?.estadoModo !== "1";
   // estado del buscador
   const [busqueda, setBusqueda] = useState('')
   const toast = useRef<Toast>(null);
@@ -115,24 +117,24 @@ export default function Page() {
   };
 
   return (
-    <div className="flex flex-col p-10 bg-gray-50 min-h-screen">
+    <div className={`flex flex-col p-10 ${isDark ? "bg-[#0F172A] text-white" : "bg-gray-50 text-black"}`}>
       <Toast ref={toast} />
       <h1 className="text-[40px] text-[#4F9CD7] font-bold">Gestión de Personal</h1>
-      <p className="text-[18px] text-gray-700 mt-2">
+      <p className={`text-[20px] pt-4 ${isDark ? "text-gray-300" : "text-black"}`}>
         En este módulo se gestionan los empleados registrados en el sistema.
       </p>
 
       <div className="flex flex-col lg:flex-row mt-10 justify-between gap-4">
         <InputText 
           placeholder="Buscar por nombre o DNI..." 
-          className="h-12 w-full lg:w-[30rem]" 
+          className={`h-12 w-[30rem] ${isDark ? "bg-[#1E293B] text-white border-gray-600" : "bg-white text-black"}`} 
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
         <div>
           <Button 
             icon='pi pi-refresh'
-            className="mr-2 bg-transparent border-transparent text-[#BACD00]"
+            className={`mr-2 bg-transparent border-transparent ${isDark ? "text-[#4F9CD7]":"text-[#BACD00]" }`}
             tooltip="Actualizar lista"
             tooltipOptions={{ position: 'top' }}
             onClick={handleRefresh}

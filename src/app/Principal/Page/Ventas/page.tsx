@@ -29,6 +29,7 @@ interface Option {
 export default function Page() {
   const {usuario,clientes,prenda,talla,ListaPrenda,ListaPedidos} = useAppContext()
   const user = usuario?.datosUsuario;
+  const isDark = user?.estadoModo !== "1";
   const [ventaTipo, setVentaTipo] = useState<Option | null>(null)
   const [visible,setVisible]=useState(false)
   const [clienteSeleccionado, setClienteSeleccionado] = useState<any>(null)
@@ -233,69 +234,77 @@ export default function Page() {
   const total = subtotal + igv
 
   return (
-    <div className="flex flex-col p-10 bg-gray-50 min-h-screen">
+    <div className={`flex flex-col p-10 min-h-screen ${isDark ? "bg-[#0F172A] text-white" : "bg-gray-50 text-black"}`}>
       <Toast ref={toast} />
-      <strong className="text-[40px] text-[#4F9CD7]">Interfaz de Ventas</strong>
-      <span className="text-[20px] text-black pt-2">En este módulo usted podrá realizar las ventas</span>
-      <div className="bg-white rounded-lg shadow-md mt-6">
+
+      <strong className={`text-[40px] text-[#4F9CD7]`}>Interfaz de Ventas</strong>
+      <span className={`text-[20px] pt-2 ${isDark ? "text-gray-300" : "text-black"}`}>
+        En este módulo usted podrá realizar las ventas
+      </span>
+
+      <div className={`rounded-lg shadow-md mt-6 ${isDark ? "bg-[#1E293B] border border-gray-700" : "bg-white"}`}>
         {/* DATOS PRODUCTOS */}
         <div className="p-6 pt-0">
-          <h2 className="text-xl font-bold text-[#4F9CD7] mb-4">Datos de Venta</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
-              <InputText
-                name="nombre"
-                value={user?.nombres}
-                className="w-full"
-                disabled
-              />
-              <Dropdown
-                placeholder="Tipo de venta"
-                value={ventaTipo}
-                onChange={(e) => setVentaTipo(e.value)}
-                options={tipoVenta}
-                optionLabel="name"
-                className="w-full"
-              />
-            </div>
-        </div>
-        {/* DATOS DEL CLIENTE */}
-        {ventaTipo?.id === 1 && (
-        <div className="p-6 pt-0">
-          <h2 className="text-xl font-bold text-[#4F9CD7] mb-4">Datos del Cliente</h2>
+          <h2 className={`text-xl font-bold mb-4 ${isDark ? "text-[#4F9CD7]" : "text-[#4F9CD7]"}`}>Datos de Venta</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
-            <div>
-              <Dropdown
-                placeholder="Seleccione cliente..."
-                value={clienteSeleccionado}
-                options={clientes}
-                optionLabel="nombre"
-                onChange={(e) => setClienteSeleccionado(e.value)}
-                className="w-full"
-                filter
-              />
-              <Button 
-                icon="pi pi-plus" 
-                className='mt-1 ml-[-50] h-[46px] bg-[#BACD00] border-[#BACD00] text-white'
-                onClick={()=>setVisible(true)}
-              />
-            </div>
-            
-            <InputText 
-              placeholder="Dirección de entrega" 
-              value={cliente.direccion} 
-              onChange={(e) => setCliente({ ...cliente, direccion: e.target.value })} 
-              />
-            <InputText 
-              placeholder="Teléfono" 
-              value={cliente.telefono} 
-              onChange={(e) => setCliente({ ...cliente, telefono: e.target.value })} 
+            <InputText
+              name="nombre"
+              value={user?.nombres}
+              className={`w-full ${isDark ? "bg-[#0F172A] text-white border-gray-600 placeholder-gray-400" : "bg-white text-black border-gray-300"}`}
+              disabled
+            />
+            <Dropdown
+              placeholder="Tipo de venta"
+              value={ventaTipo}
+              onChange={(e) => setVentaTipo(e.value)}
+              options={tipoVenta}
+              optionLabel="name"
+              className={`w-full ${isDark ? "bg-[#0F172A] text-white border-gray-600 placeholder-gray-400" : "bg-white text-black border-gray-300"}`}
             />
           </div>
         </div>
-      )}
+
+        {/* DATOS DEL CLIENTE */}
+        {ventaTipo?.id === 1 && (
+          <div className="p-6 pt-0">
+            <h2 className={`text-xl font-bold mb-4 ${isDark ? "text-[#4F9CD7]" : "text-[#4F9CD7]"}`}>Datos del Cliente</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+              <div>
+                <Dropdown
+                  placeholder="Seleccione cliente..."
+                  value={clienteSeleccionado}
+                  options={clientes}
+                  optionLabel="nombre"
+                  onChange={(e) => setClienteSeleccionado(e.value)}
+                  className={`w-full ${isDark ? "bg-[#0F172A] text-white border-gray-600 placeholder-gray-400" : "bg-white text-black border-gray-300"}`}
+                  filter
+                />
+                <Button
+                  icon="pi pi-plus"
+                  className="mt-1 ml-[-50] h-[46px] bg-[#BACD00] border-[#BACD00] text-white"
+                  onClick={() => setVisible(true)}
+                />
+              </div>
+
+              <InputText
+                placeholder="Dirección de entrega"
+                value={cliente.direccion}
+                onChange={(e) => setCliente({ ...cliente, direccion: e.target.value })}
+                className={`w-full ${isDark ? "bg-[#0F172A] text-white border-gray-600 placeholder-gray-400" : "bg-white text-black border-gray-300"}`}
+              />
+              <InputText
+                placeholder="Teléfono"
+                value={cliente.telefono}
+                onChange={(e) => setCliente({ ...cliente, telefono: e.target.value })}
+                className={`w-full ${isDark ? "bg-[#0F172A] text-white border-gray-600 placeholder-gray-400" : "bg-white text-black border-gray-300"}`}
+              />
+            </div>
+          </div>
+        )}
+
         {/* DATOS PRODUCTOS */}
         <div className="p-6 pt-0">
-          <h2 className="text-xl font-bold text-[#4F9CD7] mb-4">Productos</h2>
+          <h2 className={`text-xl font-bold mb-4 ${isDark ? "text-[#4F9CD7]" : "text-[#4F9CD7]"}`}>Productos</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end mb-4">
             <Dropdown
               placeholder="Seleccione producto..."
@@ -303,16 +312,16 @@ export default function Page() {
               options={prenda}
               optionLabel="nombre"
               onChange={(e) => handleSelect('Producto', e.value)}
-              className="w-full"
+              className={`w-full ${isDark ? "bg-[#0F172A] text-white border-gray-600 placeholder-gray-400" : "bg-white text-black border-gray-300"}`}
               filter
             />
             <Dropdown
               placeholder="Seleccione talla..."
-              onChange={(e) => handleSelect('Talla', e.value)}
               value={datos.Talla}
-              optionLabel="nombre"
               options={talla}
-              className="w-full"
+              optionLabel="nombre"
+              onChange={(e) => handleSelect('Talla', e.value)}
+              className={`w-full ${isDark ? "bg-[#0F172A] text-white border-gray-600 placeholder-gray-400" : "bg-white text-black border-gray-300"}`}
               filter
             />
             <InputText
@@ -321,7 +330,7 @@ export default function Page() {
               value={datos.Cantidad}
               onChange={handleChange}
               placeholder="Cantidad"
-              className="w-full"
+              className={`w-full ${isDark ? "bg-[#0F172A] text-white border-gray-600 placeholder-gray-400" : "bg-white text-black border-gray-300"}`}
             />
             <Button
               label="Agregar"
@@ -336,8 +345,10 @@ export default function Page() {
             value={productosAgregados}
             editMode="cell"
             dataKey="index"
-            paginator rows={5}
+            paginator
+            rows={5}
             emptyMessage="No hay productos agregados."
+            className={isDark ? "bg-[#0F172A] text-white" : ""}
           >
             <Column field="index" header="ID" />
             <Column field="Producto" header="Producto" />
@@ -364,7 +375,7 @@ export default function Page() {
 
         {/* DATOS DE PAGO */}
         <div className="p-6">
-          <h2 className="text-xl font-bold text-[#4F9CD7] mb-4">Pago</h2>
+          <h2 className={`text-xl font-bold mb-4 ${isDark ? "text-[#4F9CD7]" : "text-[#4F9CD7]"}`}>Pago</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
             <Dropdown
               placeholder="Tipo de pago"
@@ -372,7 +383,7 @@ export default function Page() {
               onChange={(e) => setPago(e.value)}
               options={tipoPago}
               optionLabel="name"
-              className="w-full"
+              className={`w-full ${isDark ? "bg-[#0F172A] text-white border-gray-600 placeholder-gray-400" : "bg-white text-black border-gray-300"}`}
             />
             <Dropdown
               placeholder="Boleta o Factura"
@@ -380,14 +391,14 @@ export default function Page() {
               onChange={(e) => setDocumento(e.value)}
               options={tipoDocumento}
               optionLabel="name"
-              className="w-full"
+              className={`w-full ${isDark ? "bg-[#0F172A] text-white border-gray-600 placeholder-gray-400" : "bg-white text-black border-gray-300"}`}
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-lg font-medium">
-            <div className="text-black">SubTotal: <span className="text-gray-800">S/{subtotal.toFixed(2)}</span></div>
-            <div className="text-black">IGV (18%): <span className="text-gray-800">S/{igv.toFixed(2)}</span></div>
-            <div className="text-black">Total: <span className="text-[#12C447] font-bold">S/{total.toFixed(2)}</span></div>
+            <div className={isDark ? "text-gray-300" : "text-black"}>SubTotal: <span className="text-gray-400">S/{subtotal.toFixed(2)}</span></div>
+            <div className={isDark ? "text-gray-300" : "text-black"}>IGV (18%): <span className="text-gray-400">S/{igv.toFixed(2)}</span></div>
+            <div className={isDark ? "text-gray-300" : "text-black"}>Total: <span className="text-[#12C447] font-bold">S/{total.toFixed(2)}</span></div>
             <div>
               <Button
                 label="Finalizar Venta"
@@ -400,7 +411,8 @@ export default function Page() {
           </div>
         </div>
       </div>
-      <DialogCliente Open={visible} Close={()=>setVisible(false)}/>
+
+      <DialogCliente Open={visible} Close={()=>setVisible(false)} />
     </div>
   )
 }

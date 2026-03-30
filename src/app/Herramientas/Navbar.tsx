@@ -7,6 +7,7 @@ import userImage from '../Imagen/producto.jpg';
 import { Button } from 'primereact/button';
 import { useAppContext } from '../Provider/AppContext';
 import { Divider } from 'primereact/divider';
+import Link from 'next/link';
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -14,6 +15,7 @@ const Navbar = () => {
   const router = useRouter();
   const { usuario } = useAppContext();
   const user = usuario?.datosUsuario;
+  const isDark = user?.estadoModo !== "1"; // Modo oscuro
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
@@ -33,20 +35,22 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="flex justify-end p-8 relative">
+    <div className={`flex justify-end p-8 relative ${isDark ? 'bg-transparent text-white' : 'bg-transparent text-black'}`}>
+      
       {/* Notificación */}
-      <div className="bg-white flex items-center justify-center rounded-lg mr-6">
+      <div className={`${isDark ? 'bg-[#1E293B]' : 'bg-white'} flex items-center justify-center rounded-lg mr-6`}>
         <Button className="bg-transparent border-transparent">
-          <i className="pi pi-bell text-[2rem] text-[#4F9CD7]"></i>
+          <i className={`pi pi-bell text-[2rem] ${isDark ? 'text-[#4F9CD7]' : 'text-[#4F9CD7]'}`}></i>
         </Button>
       </div>
 
       {/* Usuario */}
-      <div className="bg-white flex items-center justify-center rounded-lg relative">
+      <div className={`${isDark ? 'bg-[#1E293B]' : 'bg-white'} flex items-center justify-center rounded-lg relative`}>
         <div className="flex flex-col pr-[4.5rem] pl-[1rem]">
-          <strong className="text-[#4F9CD7] text-[1.2rem]">{user?.nombres}</strong>
-          <span className="text-[#B6B6B6] text-[1rem] capitalize">{user?.rol}</span>
+          <strong className={`${isDark ? 'text-[#4F9CD7]' : 'text-[#4F9CD7]'} text-[1.2rem]`}>{user?.nombres}</strong>
+          <span className={`${isDark ? 'text-gray-300' : 'text-[#B6B6B6]'} text-[1rem] capitalize`}>{user?.rol}</span>
         </div>
+
         <Button
           className="bg-transparent border-transparent"
           onClick={() => setShowMenu(prev => !prev)}
@@ -58,7 +62,8 @@ const Navbar = () => {
         {showMenu && (
           <div
             ref={menuRef}
-            className="absolute top-full right-0 mt-3 w-120 bg-white shadow-xl rounded-xl p-6 z-50 transition-all duration-200"
+            className={`absolute top-full right-0 mt-3 w-120 shadow-xl rounded-xl p-6 z-50 transition-all duration-200
+              ${isDark ? 'bg-[#1E293B] text-white' : 'bg-white text-black'}`}
           >
             {/* Encabezado del menú */}
             <div className="flex flex-col items-center mb-5">
@@ -69,8 +74,10 @@ const Navbar = () => {
                 height={120}
                 className="rounded-full border-4 border-[#4F9CD7]"
               />
-              <p className="font-semibold text-[#4F9CD7] p-0 text-[1.5rem] text-center">{user?.nombres || 'Usuario'}</p>
-              <span className="mt-1 px-3 py-1 bg-[#E1F0FA] text-[#4F9CD7] text-sm rounded-full text-center capitalize">
+              <p className={`font-semibold text-[1.5rem] text-center ${isDark ? 'text-[#4F9CD7]' : 'text-[#4F9CD7]'}`}>
+                {user?.nombres || 'Usuario'}
+              </p>
+              <span className={`mt-1 px-3 py-1 rounded-full text-sm text-center capitalize ${isDark ? 'bg-[#0F2A4A] text-[#4F9CD7]' : 'bg-[#E1F0FA] text-[#4F9CD7]'}`}>
                 {user?.rol || 'Rol'}
               </span>
             </div>
@@ -79,23 +86,25 @@ const Navbar = () => {
 
             {/* Opciones de menú */}
             <div className="flex justify-between gap-3">
+              <Link href={'/Principal/Perfil'} className="no-underline">
+                <Button
+                  className={`flex-1 text-sm justify-center ${isDark ? 'text-[#4F9CD7] hover:bg-[#0F2A4A]' : 'text-[#4F9CD7] hover:bg-[#F0F8FF]'}`}
+                  icon="pi pi-cog"
+                  label="Perfil"
+                  outlined
+                />
+              </Link>
+              
               <Button
-                className="flex-1 text-sm text-[#4F9CD7] hover:bg-[#F0F8FF] justify-center"
-                icon="pi pi-cog"
-                label="Configuraciones"
-                outlined
-              />
-              <Button
-                className="flex-1 p-2 text-sm text-[#d13030] hover:bg-[#fff5f5] justify-center"
+                className={`flex-1 p-2 text-sm justify-center ${isDark ? 'text-[#f87171] hover:bg-[#3B1F2A]' : 'text-[#d13030] hover:bg-[#fff5f5]'}`}
                 icon="pi pi-sign-out"
-                label="Cerrar Sesión"
+                label="Log Out"
                 onClick={handleLogout}
                 outlined
               />
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

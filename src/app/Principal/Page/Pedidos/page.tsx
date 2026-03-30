@@ -48,6 +48,7 @@ export default function Page() {
   const [pago, setPago] = useState<Option>(null)
   const {clientes,usuario,preVenta,ListaPedidos,ListaPrenda}=useAppContext()
   const user = usuario?.datosUsuario;
+  const isDark = user?.estadoModo !== "1";
   const tipoPago: Option[] = [
       { name: 'Efectivo', id: 1 },
       { name: 'Tarjeta', id: 2 },
@@ -175,20 +176,22 @@ export default function Page() {
   const cambio = envio - total
 
   return (
-    <div className="flex flex-col p-10 bg-gray-50 min-h-screen">
-      <strong className="text-[40px] text-[#4F9CD7]">Preventas</strong>
-      <span className="text-[20px] text-black pt-2">
+    <div className={`flex flex-col p-10 ${isDark ? "bg-[#0F172A] text-white" : "bg-gray-50 text-black"}`}>
+      <strong className={`text-[40px] text-[#4F9CD7]`}>Preventas</strong>
+      <span className={`text-[20px] pt-4 ${isDark ? "text-gray-300" : "text-black"}`}>
         En este módulo se registran los pedidos con entrega y costo de envíos
       </span>
-      <div className="bg-white rounded-lg shadow-md mt-6">
+
+      <div className={`rounded-lg shadow-md mt-6 ${isDark ? "bg-[#1E293B]" : "bg-white"}`}>
+        
         {/* TIPO DE VENTA */}
         <div className="p-6">
-          <h2 className="text-xl font-bold text-[#4F9CD7] mb-4">Informacion de Venta</h2>
+          <h2 className="text-xl font-bold text-[#4F9CD7] mb-4">Información de Venta</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
             <InputText
               name="nombre"
               value={user?.nombres}
-              className="w-full"
+              className={`${isDark ? "bg-[#334155] text-white border-gray-600" : "bg-white text-black" } w-full`}
               disabled
             />
           </div>
@@ -205,18 +208,28 @@ export default function Page() {
                 options={clientes}
                 optionLabel="nombre"
                 onChange={(e) => handleSelectCliente('nombre', e.value)}
-                className="w-full"
+                className={`w-full ${isDark ? "bg-[#334155] text-white border-gray-600" : ""}`}
                 filter
               />
               <Button 
                 icon="pi pi-plus" 
-                className='mt-1 ml-[-50] h-[46px] bg-[#BACD00] border-[#BACD00] text-white'
+                className={`mt-1 ml-[-50] h-[46px] ${isDark ? "bg-[#BACD00] border-[#BACD00] text-black" : "bg-[#BACD00] border-[#BACD00] text-white"}`}
                 onClick={()=>setVisible(true)}
               />
             </div>
             
-            <InputText placeholder="Dirección de entrega" value={cliente.direccion} onChange={(e) => setCliente({ ...cliente, direccion: e.target.value })} />
-            <InputText placeholder="Teléfono" value={cliente.telefono} onChange={(e) => setCliente({ ...cliente, telefono: e.target.value })} />
+            <InputText
+              placeholder="Dirección de entrega"
+              value={cliente.direccion}
+              onChange={(e) => setCliente({ ...cliente, direccion: e.target.value })}
+              className={`w-full ${isDark ? "bg-[#334155] text-white border-gray-600" : ""}`}
+            />
+            <InputText
+              placeholder="Teléfono"
+              value={cliente.telefono}
+              onChange={(e) => setCliente({ ...cliente, telefono: e.target.value })}
+              className={`w-full ${isDark ? "bg-[#334155] text-white border-gray-600" : ""}`}
+            />
           </div>
         </div>
 
@@ -230,7 +243,7 @@ export default function Page() {
               options={preVenta}
               optionLabel="nombreCompleto"
               onChange={(e) => handleSelect('Producto', e.value)}
-              className="w-full"
+              className={`w-full ${isDark ? "bg-[#334155] text-white border-gray-600" : ""}`}
               filter
             />
             <InputText
@@ -239,13 +252,13 @@ export default function Page() {
               value={datos.Cantidad}
               onChange={handleChange}
               placeholder="Cantidad"
-              className="w-full"
+              className={`w-full ${isDark ? "bg-[#334155] text-white border-gray-600" : ""}`}
             />
             <Button
               label="Agregar"
               icon="pi pi-plus"
               onClick={handleAgregarProducto}
-              className="w-full h-[42px] bg-[#BACD00] border-[#BACD00] text-white"
+              className={`w-full h-[42px] ${isDark ? "bg-[#BACD00] border-[#BACD00] text-black" : "bg-[#BACD00] border-[#BACD00] text-white"}`}
             />
           </div>
 
@@ -254,6 +267,7 @@ export default function Page() {
             editMode="cell"
             paginator rows={5}
             emptyMessage="No hay productos agregados."
+            className={`${isDark ? "p-datatable-dark" : ""}`} // aplica un estilo global si quieres cambiar fondo de tabla
           >
             <Column header='#' field='index'/>
             <Column field="Producto" header="Producto" />
@@ -265,7 +279,7 @@ export default function Page() {
               body={(row) => (
                 <Button
                   icon="pi pi-trash"
-                  className="bg-red-100 border-red-100 text-red-600 rounded-md hover:bg-red-200 transition duration-200"
+                  className={`rounded-md hover:opacity-80 transition duration-200 ${isDark ? "bg-red-600 border-red-600 text-white" : "bg-red-100 border-red-100 text-red-600"}`}
                   onClick={() => eliminarProducto(row.index)}
                 />
               )}
@@ -278,31 +292,30 @@ export default function Page() {
           <h2 className="text-xl font-bold text-[#4F9CD7] mb-4">Pagos</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-4">
             <Dropdown
-                placeholder="Tipo de pago"
-                value={pago}
-                onChange={(e) => setPago(e.value)}
-                options={tipoPago}
-                optionLabel="name"
-                className="w-full"
+              placeholder="Tipo de pago"
+              value={pago}
+              onChange={(e) => setPago(e.value)}
+              options={tipoPago}
+              optionLabel="name"
+              className={`${isDark ? "bg-[#334155] text-white border-gray-600" : "w-full"}`}
             />
             {pago?.id === 1 && (
               <InputText
-                  type="number"
-                  value={envio.toString()}
-                  onChange={(e) => setEnvio(Number(e.target.value))}
-                  placeholder="Costo de envío"
-                  className="w-full"
+                type="number"
+                value={envio.toString()}
+                onChange={(e) => setEnvio(Number(e.target.value))}
+                placeholder="Costo de envío"
+                className={`w-full ${isDark ? "bg-[#334155] text-white border-gray-600" : ""}`}
               />
             )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-lg font-medium">
-            <div className="text-black">SubTotal: <span className="text-gray-800">S/{subtotal.toFixed(2)}</span></div>
-            <div className="text-black">IGV (18%): <span className="text-gray-800">S/{igv.toFixed(2)}</span></div>
-            <div className="text-black">Total: <span className="text-[#12C447] font-bold">S/{total.toFixed(2)}</span></div>
-            {/* <div className="text-black">Monto: <span className="text-gray-800">S/{envio.toFixed(2)}</span></div> */}
+            <div className={`${isDark ? "text-gray-300" : "text-black"}`}>SubTotal: <span className={`${isDark ? "text-white" : "text-gray-800"}`}>S/{subtotal.toFixed(2)}</span></div>
+            <div className={`${isDark ? "text-gray-300" : "text-black"}`}>IGV (18%): <span className={`${isDark ? "text-white" : "text-gray-800"}`}>S/{igv.toFixed(2)}</span></div>
+            <div className={`${isDark ? "text-gray-300" : "text-black"}`}>Total: <span className="text-[#12C447] font-bold">S/{total.toFixed(2)}</span></div>
             {pago?.id === 1 && (
-              <div className="text-black">Cambio: <span className="text-gray-800">S/{cambio.toFixed(2)}</span></div>
+              <div className={`${isDark ? "text-gray-300" : "text-black"}`}>Cambio: <span className={`${isDark ? "text-white" : "text-gray-800"}`}>S/{cambio.toFixed(2)}</span></div>
             )}
           </div>
 
@@ -310,13 +323,14 @@ export default function Page() {
             <Button
               label="Registrar Pedido"
               icon="pi pi-check"
-              className="w-full bg-[#4F9CD7] border-[#4F9CD7] text-white"
+              className={`w-full ${isDark ? "bg-[#4F9CD7] border-[#4F9CD7] text-white" : "bg-[#4F9CD7] border-[#4F9CD7] text-white"}`}
               disabled={productosAgregados.length === 0}
               onClick={handleAgregarPedido}
             />
           </div>
         </div>
       </div>
+
       <DialogCliente Open={visible} Close={()=>setVisible(false)}/>
     </div>
   )

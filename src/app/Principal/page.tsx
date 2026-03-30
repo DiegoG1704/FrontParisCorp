@@ -15,9 +15,10 @@ import { useProduccionContext } from '../Provider/AppContextProducc';
 
 export default function Page() {
   const [visible,setVisible]=useState(false)
-  const {produccion,setSelectPrenda} = useAppContext();
+  const {produccion,setSelectPrenda, usuario} = useAppContext();
   const {Produccion}=useProduccionContext();
-
+  const user = usuario?.datosUsuario;
+  const isDark = user?.estadoModo !== "1";
  // Devuelve el nombre del estado con estilo de color
   const getNombreEstado = (id: string | number) => {
     const estadoMap: { [key: number]: { nombre: string; color: string; icon: string } } = {
@@ -202,29 +203,41 @@ export default function Page() {
       );
     };
 
-  return (
-    <div className="flex flex-col p-10">
+   return (
+    <div className={`flex flex-col p-10 min-h-screen transition-colors duration-300 ${isDark ? "bg-[#0F172A] text-white" : "bg-gray-50 text-black"}`}>
       <Toast ref={toast} />
       <ConfirmDialog />
-      <strong className='text-[40px] text-black'>Lista de Produccion</strong>
-      <span className='text-[20px] text-black pt-4'>En este módulo usted podrá ver la lista de produccion </span>
-      <div className='flex mt-20 justify-between'>
-        <InputText placeholder='Buscar...' className='h-12 w-[30rem]'/>
+      
+      <strong className={`text-[40px] text-[#4F9CD7]`}>Lista de Producción</strong>
+      <span className={`text-[20px] pt-4 ${isDark ? "text-gray-300" : "text-black"}`}>En este módulo usted podrá ver la lista de producción</span>
+      
+      <div className='flex mt-10 justify-between'>
+        <InputText placeholder='Buscar...' className={`h-12 w-[30rem] ${isDark ? "bg-[#1E293B] text-white border-gray-600" : "bg-white text-black"}`} />
         <div className='flex'>
-          <Button icon='pi pi-file-excel' label='Exportar Excel' className='text-[#4F9CD7] bg-[white] border-[#4F9CD7] mr-2'/>
-          <Button icon='pi pi-plus' className='bg-[#BACD00] text-[white] border-[#BACD00]'>
-            <Link href={'/Principal/Page/CrearProduccion'} className='text-white duration-200 no-underline'><span>Iniciar Produccion</span></Link>
+          <Button icon='pi pi-file-excel' label='Exportar Excel' className='mr-2' style={{
+            backgroundColor: isDark ? "#1E293B" : "white",
+            color: "#4F9CD7",
+            borderColor: "#4F9CD7"
+          }} />
+          <Button icon='pi pi-plus' className='text-white' style={{
+            backgroundColor: "#BACD00",
+            borderColor: "#BACD00"
+          }}>
+            <Link href={'/Principal/Page/CrearProduccion'} className='text-white no-underline'>
+              Iniciar Producción
+            </Link>
           </Button>
         </div>
       </div>
+
       <div className="card mt-6">
         <DataTable
           value={produccion}
           tableStyle={{ minWidth: '50rem' }}
-          className="tabla-punteada"
+          className={`tabla-punteada ${isDark ? "bg-[#1E293B] text-white" : ""}`}
           paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]}
         >
-          <Column field="codigoProduccion" header="Codigo" />
+          <Column field="codigoProduccion" header="Código" />
           <Column field="nombreModelo" header="Modelo" />
           <Column field="cantidad" header="Cantidad Proyectada" />
           <Column field="fecha" header="Fecha de Inicio" />
@@ -235,7 +248,8 @@ export default function Page() {
           <Column body={(rowData) => Acciones(rowData)} header="Acciones" />
         </DataTable>
       </div>
-      <DialogDetalles Open={visible} Close={()=>setVisible(false)}/>
+
+      <DialogDetalles Open={visible} Close={()=>setVisible(false)} />
     </div>
   );
 }

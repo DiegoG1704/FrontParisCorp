@@ -13,6 +13,7 @@ import { Toast } from "primereact/toast";
 export default function Page() {
   const {usuario,asistencia,asistenciaPers,ListaAsistencia,ListaAsistenciaId,dashAsist,ListaAsistenciaDash} = useAppContext()
   const user = usuario?.datosUsuario;
+  const isDark = user?.estadoModo !== "1";
   const toast = useRef<any>(null);
   const [fecha, setFecha] = useState<Date | null>(new Date());
 
@@ -86,137 +87,112 @@ export default function Page() {
     });
 
   return (
-    <div className="flex flex-col p-8 gap-6 bg-gray-50 min-h-screen">
+    <div className={`flex flex-col p-8 gap-6 min-h-screen ${isDark ? "bg-[#0F172A] text-white" : "bg-gray-50 text-black"}`}>
       <Toast ref={toast} />
+
       {/* HEADER */}
       <div>
-        <h1 className="text-[38px] font-bold text-[#4F9CD7]">
+        <h1 className={`text-[38px] font-bold ${isDark ? "text-white" : "text-[#4F9CD7]"}`}>
           Asistencia
         </h1>
-        <p className="text-gray-600">
+        <p className={`${isDark ? "text-gray-300" : "text-gray-600"}`}>
           Control y gestión de asistencia del personal
         </p>
       </div>
 
-
       {/* DASHBOARD */}
       <div className="grid grid-cols-4 gap-5">
-
-        <div className="bg-white shadow rounded-lg p-5">
-          <p className="text-gray-500">Presentes</p>
-          <h2 className="text-3xl font-bold text-green-600">{dashAsist.presentes}</h2>
-        </div>
-
-        <div className="bg-white shadow rounded-lg p-5">
-          <p className="text-gray-500">Tardanzas</p>
-          <h2 className="text-3xl font-bold text-yellow-600">{dashAsist.tardanzas}</h2>
-        </div>
-
-        <div className="bg-white shadow rounded-lg p-5">
-          <p className="text-gray-500">Faltas</p>
-          <h2 className="text-3xl font-bold text-red-600">{dashAsist.faltas}</h2>
-        </div>
-
-        <div className="bg-white shadow rounded-lg p-5">
-          <p className="text-gray-500">Permisos</p>
-          <h2 className="text-3xl font-bold text-blue-600">{dashAsist.permisos}</h2>
-        </div>
-
+        {[
+          { label: "Presentes", value: dashAsist.presentes, color: "green" },
+          { label: "Tardanzas", value: dashAsist.tardanzas, color: "yellow" },
+          { label: "Faltas", value: dashAsist.faltas, color: "red" },
+          { label: "Permisos", value: dashAsist.permisos, color: "blue" },
+        ].map((item) => (
+          <div
+            key={item.label}
+            className={`rounded-lg p-5 shadow ${
+              isDark ? "bg-[#1E293B]" : "bg-white"
+            }`}
+          >
+            <p className={`${isDark ? "text-gray-300" : "text-gray-500"}`}>{item.label}</p>
+            <h2 className={`text-3xl font-bold text-${item.color}-600`}>{item.value}</h2>
+          </div>
+        ))}
       </div>
-
 
       {/* ACCIONES */}
       <div className="flex gap-4">
-
         <Button
           label="Registrar Entrada"
           icon="pi pi-sign-in"
           className="bg-green-600 border-green-600"
           onClick={handleSudmit}
         />
-
-        {/* <Button
-          label="Registrar Salida"
-          icon="pi pi-sign-out"
-          className="bg-blue-600 border-blue-600"
-        /> */}
-
       </div>
-
 
       {/* FILTROS */}
       {(user?.idRol === 1 || user?.idRol === 7) && (
-      <div className="flex gap-4 bg-white p-4 rounded-lg shadow">
+        <div
+          className={`flex gap-4 p-4 rounded-lg shadow ${
+            isDark ? "bg-[#1E293B]" : "bg-white"
+          }`}
+        >
+          <span className="p-input-icon-left w-full">
+            <i className="pi pi-search" />
+            <InputText
+              placeholder="Buscar empleado"
+              className={`w-full ${isDark ? "bg-[#0F172A] text-white border-gray-600 placeholder-gray-400" : "bg-white text-black border-gray-300"}`}
+            />
+          </span>
 
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
-          <InputText placeholder="Buscar empleado" />
-        </span>
-
-        <Calendar
-          value={fecha}
-          onChange={(e) => setFecha(e.value as Date)}
-          dateFormat="dd/mm/yy"
-          showIcon
-        />
-
-      </div>
+          <Calendar
+            value={fecha}
+            onChange={(e) => setFecha(e.value as Date)}
+            dateFormat="dd/mm/yy"
+            showIcon
+            className={`${isDark ? "bg-[#0F172A] text-white border-gray-600" : ""}`}
+          />
+        </div>
       )}
 
-
-      {/* TABLA */}
+      {/* TABLA ASISTENCIA */}
       {(user?.idRol === 1 || user?.idRol === 7) && (
-
-        <div className="bg-white shadow rounded-lg p-4">
-
+        <div className={`rounded-lg p-4 shadow ${isDark ? "bg-[#1E293B]" : "bg-white"}`}>
           <DataTable
             value={asistenciaFiltrada}
             paginator
             rows={10}
             responsiveLayout="scroll"
+            className={`${isDark ? "text-white" : ""}`}
           >
-
             <Column field="nombres" header="Empleado" />
             <Column field="rol" header="Cargo" />
             <Column field="fecha" header="Fecha" />
             <Column field="horaIngreso" body={horaTemplate} header="Hora Ingreso" />
             <Column field="horas" header="Horas trabajadas" />
-
-            <Column
-              field="Estado"
-              header="Estado"
-              body={estadoTemplate}
-            />
-
+            <Column field="Estado" header="Estado" body={estadoTemplate} />
           </DataTable>
-
         </div>
-
       )}
 
-      <div className="bg-white shadow rounded-lg p-4">
-        <h3 className="text-black">Historial de Asistencias</h3>
-          <DataTable
-            value={asistenciaPers}
-            paginator
-            rows={10}
-            responsiveLayout="scroll"
-          >
-
-            <Column field="nombres" header="Empleado" />
-            <Column field="rol" header="Cargo" />
-            <Column field="fecha" header="Fecha" />
-            <Column field="horaIngreso" body={horaTemplate} header="Hora Ingreso" />
-            <Column field="salida" header="Estado" body={estadoTemplate}/>
-            <Column
-              field="estado"
-              header="Obs."
-            />
-
-          </DataTable>
-
-        </div>
-
+      {/* TABLA HISTORIAL PERSONAL */}
+      <div className={`rounded-lg p-4 shadow ${isDark ? "bg-[#1E293B]" : "bg-white"}`}>
+        <h3 className={`${isDark ? "text-white" : "text-black"}`}>Historial de Asistencias</h3>
+        <DataTable
+          value={asistenciaPers}
+          paginator
+          rows={10}
+          responsiveLayout="scroll"
+          className={`${isDark ? "text-white" : ""}`}
+        >
+          <Column field="nombres" header="Empleado" />
+          <Column field="rol" header="Cargo" />
+          <Column field="fecha" header="Fecha" />
+          <Column field="horaIngreso" body={horaTemplate} header="Hora Ingreso" />
+          <Column field="salida" header="Estado" body={estadoTemplate} />
+          <Column field="estado" header="Obs." />
+        </DataTable>
+      </div>
     </div>
   );
 }

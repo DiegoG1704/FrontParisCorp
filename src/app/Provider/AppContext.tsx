@@ -101,6 +101,7 @@ interface AppContextType {
   pedidos:any;
   dashAsist:any;
   preVenta:any;
+  config:any;
   asistencia:any;
   asistenciaPers:any;
   setVisible: (v: boolean) => void;
@@ -125,8 +126,11 @@ interface AppContextType {
   ListaAsistencia:()=>Promise<void>;
   ListaAsistenciaId:()=>Promise<void>;
   ListaAsistenciaDash:()=>Promise<void>;
+  ListaConfiguraciones:()=>Promise<void>;
+  me:()=>Promise<void>;
   selectInforme:InformeProduc| null;
   setSelectInforme:(p:InformeProduc| null)=>void;
+  setConfig:()=>void;
   setSelectPedidos:()=>void;
   informePedidos:any;
 }
@@ -151,6 +155,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
   const [roles,setRoles]=useState([])
   const [asistencia,setAsistencia]=useState([])
   const [asistenciaPers,setAsistenciaPers]=useState([])
+  const [config,setConfig]=useState([])
   const [personal,setPersonal]=useState([])
   const [material,setMaterial]=useState([])
   const [produccion,setProduccion]=useState([])
@@ -397,6 +402,15 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     }
   }
 
+  const ListaConfiguraciones = async()=>{
+    try {
+      const response=await axiosInstance.get(`getConfiguraciones/${usuario?.datosUsuario?.id}`)
+      setConfig(response.data)
+    } catch (error) {
+      console.error('error', error)
+    }
+  }
+
   const ListaAsistenciaDash = async()=>{
     try {
       const response=await axiosInstance.get(`getAsistencia/dashboard/${usuario?.datosUsuario?.id}`)
@@ -478,6 +492,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     if (usuario?.datosUsuario?.id) {
       ListaAsistenciaId();
       ListaAsistenciaDash();
+      ListaConfiguraciones();
     }
   }, [usuario]);
 
@@ -574,7 +589,10 @@ export const AppProvider = ({ children }: AppProviderProps) => {
         ListaAsistencia,
         ListaAsistenciaId,
         dashAsist,
-        ListaAsistenciaDash
+        ListaAsistenciaDash,
+        ListaConfiguraciones,
+        config,
+        me
       }}
     >
       {children}

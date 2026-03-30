@@ -12,12 +12,14 @@ import { useAppContext } from '@/app/Provider/AppContext';
 import { Toast } from 'primereact/toast';
 
 export default function Page() {
-  const {pedidos,setSelectPedidos,ListaPedidos} = useAppContext()
+  const {pedidos,setSelectPedidos,ListaPedidos,usuario} = useAppContext()
   const[visible,setVisible]=useState(false)
   const[select,setSelect]=useState([])
   const[visible2,setVisible2]=useState(false)
   const [search, setSearch] = useState("");
   const toast = useRef<Toast>(null);
+  const user = usuario?.datosUsuario;
+  const isDark = user?.estadoModo !== "1";
 
   const handleRefresh = async () => {
     try {
@@ -163,22 +165,22 @@ export default function Page() {
     
     
   return (
-    <div className="flex flex-col p-10 bg-gray-50 min-h-screen">
+    <div className={`flex flex-col p-10 ${isDark ? "bg-[#0F172A] text-white" : "bg-gray-50 text-black"}`}>
       <Toast ref={toast} />
       <strong className="text-[40px] text-[#4F9CD7]">Gestión de Envios</strong>
-      <span className="text-[20px] text-black pt-2">
+      <span className={`text-[20px] pt-4 ${isDark ? "text-gray-300" : "text-black"}`}>
         En este módulo se gestionara los pedidos enviados
       </span>
       <div className="flex flex-col lg:flex-row mt-10 justify-between gap-4">
         <InputText 
           placeholder="Buscar..." 
-          className="h-12 w-full lg:w-[30rem]" 
+          className={`h-12 w-[30rem] ${isDark ? "bg-[#1E293B] text-white border-gray-600" : "bg-white text-black"}`}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <Button 
           icon='pi pi-refresh'
-          className="mr-2 bg-transparent border-transparent text-[#BACD00]"
+          className={`mr-2 bg-transparent border-transparent ${isDark ? "text-[#4F9CD7]":"text-[#BACD00]" }`}
           tooltip="Actualizar lista"
           tooltipOptions={{ position: 'top' }}
           onClick={handleRefresh}

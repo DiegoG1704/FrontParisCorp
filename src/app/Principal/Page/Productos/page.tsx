@@ -5,7 +5,7 @@ import { Button } from 'primereact/button'
 import { Column } from 'primereact/column'
 import { DataTable } from 'primereact/datatable'
 import { InputText } from 'primereact/inputtext'
-import React, { useState } from 'react'
+import React from 'react'
 import DialogProductos from './Components/DialogProductos'
 import { useAppContext } from '@/app/Provider/AppContext'
 
@@ -32,7 +32,9 @@ interface Modelo {
 }
 
 export default function Page() {
-  const{modelo,visible,setVisible,setSelectProd}=useAppContext();
+  const{modelo,visible,setVisible,setSelectProd, usuario}=useAppContext();
+  const user = usuario?.datosUsuario;
+  const isDark = user?.estadoModo !== "1";
   const Acciones = () => (
     <div className="flex gap-2">
       <Button
@@ -57,21 +59,21 @@ export default function Page() {
         className="bg-purple-200 border-purple-200 text-purple-700 rounded-md hover:bg-purple-400 transition duration-200"
         tooltip="ver Productos"
         tooltipOptions={{ position: 'top' }}
-        onClick={()=>{setVisible(true),setSelectProd(rowdata)}}
+        onClick={()=>{setVisible(true);setSelectProd(rowdata)}}
       />
     </div>
   );
 
   return (
-    <div className="flex flex-col p-10">
-      <strong className="text-[40px] text-black">Lista de Productos Registrados</strong>
-      <span className="text-[20px] text-black pt-4">En este módulo usted podrá ver la lista de producción</span>
+    <div className={`flex flex-col p-10 ${isDark ? "bg-[#0F172A] text-white" : "bg-gray-50 text-black"}`}>
+      <strong className={`text-[40px] ${isDark ? "text-[#4F9CD7]" : "text-black"}`}>Lista de Productos Registrados</strong>
+      <span className={`text-[20px] pt-4 ${isDark ? "text-gray-300" : "text-black"}`}>En este módulo usted podrá ver la lista de producción</span>
 
       <div className="flex flex-col lg:flex-row mt-10 justify-between gap-4">
-        <InputText placeholder="Buscar..." className="h-12 w-full lg:w-[30rem]" />
+        <InputText placeholder="Buscar..." className={`h-12 w-[30rem] ${isDark ? "bg-[#1E293B] text-white border-gray-600" : "bg-white text-black"}`} />
 
         <div className="flex gap-2">
-          <Button icon="pi pi-file-excel" label="Exportar Excel" className="text-[#4F9CD7] bg-white border-[#4F9CD7]" />
+          <Button icon="pi pi-file-excel" label="Exportar Excel" className={`bg-transparent border-transparent ${isDark ? "text-[#4F9CD7] bg-[#1E293B] border-[#4F9CD7]" : "text-[#4F9CD7] bg-white border-[#4F9CD7]"}`}/>
           
           <Link href="/Principal/Page/Productos/CrearProductos" passHref legacyBehavior>
             <Button icon="pi pi-plus" className="bg-[#BACD00] text-white border-[#BACD00]">

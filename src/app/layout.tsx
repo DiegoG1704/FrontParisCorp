@@ -36,7 +36,7 @@ export default function RootLayout({
           )}
 
           {/* Contenido principal */}
-          <main className={`${showSidebar ? "pl-64" : "pl-0"} bg-gray-100 min-h-screen`}>
+          <main className={`${showSidebar ? "pl-64" : "pl-0"} bg-gray-100 h-full`}>
             {children}
           </main>
         </AppProviderPrincipal>

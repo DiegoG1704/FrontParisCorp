@@ -8,14 +8,16 @@ import { useAppContext } from '@/app/Provider/AppContext';
 import { Button } from 'primereact/button';
 import DialogProductos from './Components/DialogProductos';
 
-export default function page() {
-    const {prenda}=useAppContext();
+export default function Page() {
+    const {prenda,usuario}=useAppContext();
     const [selectedTallas, setSelectedTallas] = useState<any[]>([]);
     const [visible, setVisible] = useState(false);
+    const user = usuario?.datosUsuario;
+    const isDark = user?.estadoModo !== "1";
 
     const DetallesButton = (rowdata: any) => (
       <Button
-        onClick={() => {setSelectedTallas(rowdata),setVisible(true)}}
+        onClick={() => {setSelectedTallas(rowdata);setVisible(true)}}
         className="text-blue-600 bg-transparent"
       >
         Ver tallas
@@ -36,13 +38,13 @@ export default function page() {
     )};
 
   return (
-    <div className="flex flex-col p-10">
-      <strong className="text-[40px] text-black">Almacen</strong>
-      <span className="text-[20px] text-black pt-4">En este módulo usted podrá ver los productos almacenados</span>
+    <div className={`flex h-full flex-col p-10 ${isDark ? "bg-[#0F172A] text-white" : "bg-gray-50 text-black"}`}>
+      <strong className={`text-[40px] text-[#4F9CD7]`}>Almacen</strong>
+      <span className={`text-[20px] pt-4 ${isDark ? "text-gray-300" : "text-black"}`}>En este módulo usted podrá ver los productos almacenados</span>
       <div className="flex flex-col lg:flex-row mt-10">
-        <InputText placeholder="Buscar..." className="h-12 w-full lg:w-[30rem]" />
+        <InputText placeholder="Buscar..." className={`h-12 w-[30rem] ${isDark ? "bg-[#1E293B] text-white border-gray-600" : "bg-white text-black"}`} />
       </div>
-      <div className="card my-10">
+      <div className="card my-10 h-full">
             <DataTable
             value={prenda}
             tableStyle={{ minWidth: '50rem' }}
