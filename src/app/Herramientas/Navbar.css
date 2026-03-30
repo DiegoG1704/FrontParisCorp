@@ -1,0 +1,32 @@
+/* Asegurarse de que el texto de los submenús sea blanco */
+.ant-menu-submenu, .ant-menu-item, .ant-menu-item > a {
+  color: white !important;  /* Forzar el color blanco en los submenús */
+}
+
+.ant-menu-submenu:hover, .ant-menu-item:hover {
+  color: white !important;  /* Forzar el color blanco al hacer hover */
+}
+
+/* También puedes aplicar esto si los submenús tienen un fondo oscuro */
+.ant-menu-submenu-popup {
+  background-color: #2d3748 !important;  /* Fondo oscuro para los submenús */
+}
+
+.ant-menu-item-group {
+  color: white;
+}
+
+/* Navbar.css */
+.nav-icon {
+  font-size: 24px;  /* Tamaño del icono */
+  color: white;     /* Color blanco para los iconos */
+}
+
+:where(.css-dev-only-do-not-override-1htoz2s).ant-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: #f5f5f5;
+}
+
+
