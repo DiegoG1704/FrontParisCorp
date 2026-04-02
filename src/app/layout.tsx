@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const showSidebar = pathname !== "/";
+const showSidebar = pathname !== "/";
 
   return (
     <html lang="en">
