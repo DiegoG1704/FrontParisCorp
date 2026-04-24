@@ -43,7 +43,7 @@ export default function DialogAgregar({ Close, Open }: Props) {
 
   const handleAgregar = async() => {
     try {
-      const result = await axiosInstance.post('postPersonal',datos)
+      await axiosInstance.post('postPersonal',datos)
       setDatos({
         dni: '',
         nombres: '',

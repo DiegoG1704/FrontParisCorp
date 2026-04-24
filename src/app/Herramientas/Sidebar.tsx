@@ -133,7 +133,7 @@ const Sidebar = () => {
         }`}
       >
         <Image
-          src={userImage}
+          src={user?.fotoPerfil ? `http://localhost:4000/uploads/${user.fotoPerfil}` : userImage}
           alt="user"
           width={55}
           height={55}

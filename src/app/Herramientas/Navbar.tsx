@@ -8,12 +8,22 @@ import { Button } from 'primereact/button';
 import { useAppContext } from '../Provider/AppContext';
 import { Divider } from 'primereact/divider';
 import Link from 'next/link';
+import DialogNotificaciones from '../Components/DialogNotificaciones';
+import axiosInstance from './axiosToken';
+import DialogEnviar from '../Components/DialogEnviar';
+import DialogRemitente from '../Components/DialogEnv';
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [visible,setVisible]=useState(false)
+  const [visibleRem,setVisibleRem]=useState(false)
+  const [selectedNotif, setSelectedNotif] = useState<any>(null);
+  const [showDialog, setShowDialog] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { usuario } = useAppContext();
+  const { usuario,notif,ListaNotificiaciones } = useAppContext();
   const user = usuario?.datosUsuario;
   const isDark = user?.estadoModo !== "1"; // Modo oscuro
 
@@ -24,12 +34,27 @@ const Navbar = () => {
     router.push('/');
   };
 
+  const marcarLeido = async(id:number)=>{
+    try {
+      await axiosInstance.put(`putLeido/${id}`)
+      console.log('exito');
+      ListaNotificiaciones();
+    } catch (error) {
+      console.log('Error',error);
+    }
+  }
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      if (
+        menuRef.current && !menuRef.current.contains(event.target as Node) &&
+        notifRef.current && !notifRef.current.contains(event.target as Node)
+      ) {
         setShowMenu(false);
+        setShowNotifications(false);
       }
     };
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -39,15 +64,30 @@ const Navbar = () => {
       
       {/* Notificación */}
       <div className={`${isDark ? 'bg-[#1E293B]' : 'bg-white'} flex items-center justify-center rounded-lg mr-6`}>
-        <Button className="bg-transparent border-transparent">
-          <i className={`pi pi-bell text-[2rem] ${isDark ? 'text-[#4F9CD7]' : 'text-[#4F9CD7]'}`}></i>
-        </Button>
+        <div className="relative">
+          <Button
+            className="bg-transparent border-transparent"
+            onClick={() => setShowNotifications(prev => !prev)}
+          >
+            <i className={`pi pi-bell text-[2rem] text-[#4F9CD7]`}></i>
+          </Button>
+
+          {notif?.filter((n: any) => n.estado === "1").length > 0 && (
+            <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-2">
+              {notif.filter((n: any) => n.estado === "1").length}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Usuario */}
       <div className={`${isDark ? 'bg-[#1E293B]' : 'bg-white'} flex items-center justify-center rounded-lg relative`}>
         <div className="flex flex-col pr-[4.5rem] pl-[1rem]">
-          <strong className={`${isDark ? 'text-[#4F9CD7]' : 'text-[#4F9CD7]'} text-[1.2rem]`}>{user?.nombres}</strong>
+          <strong className={`${isDark ? 'text-[#4F9CD7]' : 'text-[#4F9CD7]'} text-[1.2rem]`}>
+            {user?.nombres?.length > 15 
+              ? user.nombres.slice(0, 15) + '...' 
+              : user?.nombres}
+          </strong>
           <span className={`${isDark ? 'text-gray-300' : 'text-[#B6B6B6]'} text-[1rem] capitalize`}>{user?.rol}</span>
         </div>
 
@@ -55,7 +95,7 @@ const Navbar = () => {
           className="bg-transparent border-transparent"
           onClick={() => setShowMenu(prev => !prev)}
         >
-          <Image src={userImage} alt="user" width={55} height={55} className="rounded-full" />
+          <Image src={user?.fotoPerfil ? `http://localhost:4000/uploads/${user.fotoPerfil}` : userImage} alt="user" width={55} height={55} className="rounded-full" />
         </Button>
 
         {/* Menú personalizado */}
@@ -105,7 +145,92 @@ const Navbar = () => {
             </div>
           </div>
         )}
+
+        {showNotifications && (
+          <div
+            ref={notifRef}
+            className={`absolute top-full right-[22rem] mt-3 w-80 shadow-xl rounded-xl p-4 z-50
+              ${isDark ? 'bg-[#1E293B] text-white' : 'bg-white text-black'}`}
+          >
+            <div className='flex justify-between'>
+              <h3 className="font-semibold mb-3 text-[#4F9CD7]">Notificaciones</h3>
+              <Button 
+                className="bg-transparent border-transparent font-semibold mb-3 text-[#4F9CD7]" 
+                icon ='pi pi-plus'
+                onClick={()=>setVisible(true)}
+              />
+            </div>
+            
+
+            <div className="flex flex-col gap-2 max-h-65 overflow-y-auto">
+              {notif && notif.length > 0 ? (
+                notif.map((n: any) => {
+                  const fecha = new Date(n.fechaEnvio).toLocaleString();
+
+                  return (
+                    <div
+                      key={n.id} 
+                      className={`p-3 rounded-lg cursor-pointer transition-all
+                        ${n.estado === "1"
+                          ? isDark
+                            ? 'bg-[#0F172A]'
+                            : 'bg-gray-100'
+                          : ''
+                        }
+                        hover:bg-gray-200 dark:hover:bg-[#0F172A]
+                      `}
+                    >
+                      <div className="flex flex-col">
+                        <div className='flex justify-between'>
+                          <div
+                            onClick={() => {
+                              setSelectedNotif(n);
+                              setShowDialog(true);
+                              marcarLeido(n.id);
+                            }}  
+                            className="flex flex-col"
+                          >
+                            <span className="font-semibold text-lg">
+                              {n.titulo}
+                            </span>
+
+                            <span className="text-sm opacity-80">
+                              {n.mensaje}
+                            </span>
+                          </div>
+                          <Button 
+                            className='bg-transparent border-transparent' 
+                            icon='pi pi-send'
+                            tooltip='Responder'
+                            onClick={()=>{
+                              setSelectedNotif(n);
+                              setVisibleRem(true);
+                              marcarLeido(n.id);
+                            }}
+                          />
+                        </div>
+                        
+
+                        <span className=" flex text-[10px] mt-1 opacity-60 justify-end">
+                          {fecha}
+                        </span>
+                        
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center text-sm opacity-70">
+                  No hay notificaciones
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
+      <DialogNotificaciones Open={showDialog} Close={()=>setShowDialog(false)} Datos={selectedNotif}/>
+      <DialogEnviar Open={visible} Close={()=>setVisible(false)}/>
+      <DialogRemitente Open={visibleRem} Close={()=>setVisibleRem(false)} Datos={selectedNotif}/>
     </div>
   );
 };

@@ -65,14 +65,14 @@ export default function Page() {
               label="Cambiar"
               className={`${
                 isDark
-                  ? "" // 👈 card oscuro
+                  ? "bg-[#4F9CD7] border-[#4F9CD7]" // 👈 card oscuro
                   : "bg-[#BACD00] text-white border-[#BACD00]"
               }`}
               onClick={()=>setVisible(true)}
             />
           </div>
 
-          {/* <Divider />
+          <Divider />
 
           <div className="flex items-center justify-between">
             <span>Formato de documento</span>
@@ -80,11 +80,11 @@ export default function Page() {
               label="Ver"
               className={`${
                 isDark
-                  ? "" // 👈 card oscuro
+                  ? "bg-[#4F9CD7] border-[#4F9CD7]" // 👈 card oscuro
                   : "bg-[#BACD00] text-white border-[#BACD00]"
               }`}
             />
-          </div> */}
+          </div>
 
           <Divider />
 

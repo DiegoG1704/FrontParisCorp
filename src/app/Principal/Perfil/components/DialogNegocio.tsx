@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
@@ -8,35 +8,44 @@ import { useAppContext } from "@/app/Provider/AppContext";
 import axiosInstance from "@/app/Herramientas/axiosToken";
 import { Toast } from "primereact/toast";
 
+interface Datos {
+  campo: string;
+  valor: string;
+}
+
 interface Props {
   Open: boolean;
   Close: () => void;
-  Datos:any
+  Datos:Datos;
 }
 
-export default function DialogCampos({ Open, Close,Datos }: Props) {
+export default function DialogCamposNeg({ Open, Close,Datos }: Props) {
   const {usuario,me} = useAppContext()
   const user = usuario?.datosUsuario;
-  const [valor,setValor]=useState("")
   const toast = useRef(null);
+  const [valor, setValor] = useState("");
+
+  useEffect(() => {
+    setValor(Datos?.valor || "");
+  }, [Datos]);
 
   const Titulo = () => (
     <div className="flex items-center gap-3">
       <i className="pi pi-user-edit bg-[#dee87b] p-3 rounded-md text-[#BACD00] text-xl" />
       <p className="text-[#BACD00] text-[1.5rem] font-semibold">
-        Editar Campo
+        Editar imagen
       </p>
     </div>
   );
 
   const handleSubmit = async () => {
     try {
-        await axiosInstance.put(`EditCampo/${user.id}`, {
+        await axiosInstance.put(`EditCampoNeg/${user.id}`, {
         campo: Datos.campo,
         valor: valor,
         });
 
-        toast.current.show({
+        toast.current?.show({
         severity: "success",
         summary: "Guardado",
         detail: "Campo actualizado correctamente",
@@ -49,7 +58,7 @@ export default function DialogCampos({ Open, Close,Datos }: Props) {
     } catch (error) {
         console.log("ERROR", error);
 
-        toast.current.show({
+        toast.current?.show({
         severity: "error",
         summary: "Error",
         detail: "No se pudo actualizar el campo",
@@ -72,7 +81,6 @@ export default function DialogCampos({ Open, Close,Datos }: Props) {
             <div>
                 <p className="text-ml text-gray-500">Agregar campo {Datos?.campo}</p>
                 <InputText 
-                    placeholder="Ingresar valor..." 
                     className="w-full" 
                     value={valor} 
                     onChange={(e)=>setValor(e.target.value)}

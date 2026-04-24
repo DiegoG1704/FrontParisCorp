@@ -69,8 +69,7 @@ export interface InfomPrenda {
 
 
 interface AppContextType {
-  user: string | null;
-  setUser: (user: string | null) => void;
+  user: any;
   setPrendasConf: React.Dispatch<React.SetStateAction<InfomPrenda[]>>;
   theme: "light" | "dark";
   setTheme: (theme: "light" | "dark") => void;
@@ -98,6 +97,7 @@ interface AppContextType {
   usuario:string | null;
   detallePrenda:any;
   prendasConf:any;
+  notif:any;
   pedidos:any;
   dashAsist:any;
   preVenta:any;
@@ -127,6 +127,7 @@ interface AppContextType {
   ListaAsistenciaId:()=>Promise<void>;
   ListaAsistenciaDash:()=>Promise<void>;
   ListaConfiguraciones:()=>Promise<void>;
+  ListaNotificiaciones:()=>Promise<void>;
   me:()=>Promise<void>;
   selectInforme:InformeProduc| null;
   setSelectInforme:(p:InformeProduc| null)=>void;
@@ -142,7 +143,7 @@ interface AppProviderProps {
 }
 
 export const AppProvider = ({ children }: AppProviderProps) => {
-  const [user, setUser] = useState<string | null>(null);
+  
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [listProductos] = useState<Modulo[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -156,6 +157,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
   const [asistencia,setAsistencia]=useState([])
   const [asistenciaPers,setAsistenciaPers]=useState([])
   const [config,setConfig]=useState([])
+  const [notif,setnotif]=useState([])
   const [personal,setPersonal]=useState([])
   const [material,setMaterial]=useState([])
   const [produccion,setProduccion]=useState([])
@@ -177,6 +179,8 @@ export const AppProvider = ({ children }: AppProviderProps) => {
   const [informePedidos,setInformePedidos]=useState(null);
   const [pedidos,setPedidos]=useState<InformeProduc| null>(null);
   const [preVenta, setPreventa] = useState([])
+
+  const user = usuario?.datosUsuario;
 
   const router = useRouter();
 
@@ -411,6 +415,15 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     }
   }
 
+  const ListaNotificiaciones = async()=>{
+    try {
+      const response=await axiosInstance.get(`getNotificaciones/${usuario?.datosUsuario?.id}`)
+      setnotif(response.data)
+    } catch (error) {
+      console.error('error', error)
+    }
+  }
+
   const ListaAsistenciaDash = async()=>{
     try {
       const response=await axiosInstance.get(`getAsistencia/dashboard/${usuario?.datosUsuario?.id}`)
@@ -493,6 +506,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
       ListaAsistenciaId();
       ListaAsistenciaDash();
       ListaConfiguraciones();
+      ListaNotificiaciones();
     }
   }, [usuario]);
 
@@ -532,7 +546,6 @@ export const AppProvider = ({ children }: AppProviderProps) => {
       value={{
         user,
         usuario,
-        setUser,
         theme,
         setTheme,
         listProductos,
@@ -591,7 +604,9 @@ export const AppProvider = ({ children }: AppProviderProps) => {
         dashAsist,
         ListaAsistenciaDash,
         ListaConfiguraciones,
+        ListaNotificiaciones,
         config,
+        notif,
         me
       }}
     >

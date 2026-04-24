@@ -5,21 +5,30 @@ import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import userImage from '../../Imagen/producto.jpg';
 import logo from '../../Imagen/logoWhite.png';
+import logoNeg from '../../Imagen/plantillaNegocio.png'
 import { Divider } from "primereact/divider";
 import { useAppContext } from "@/app/Provider/AppContext";
 import Image from "next/image";
 import DialogCampos from "./components/DialogCampos";
 import DialogCorreo from "./components/DialogCorreo";
 import { useRouter } from "next/navigation";
+import DialogCamposNeg from "./components/DialogNegocio";
+import DialogImage from "./components/DialogImage";
+import DialogImageNegocio from "./components/DialogImageNeg";
 
 export default function Page() {
   const { usuario } = useAppContext();
   const [visibleCampos, setVisibleCampos] = useState(false);
+  const [visibleNeg, setVisibleNeg] = useState(false);
+  const [visibleImg, setVisibleImg] = useState(false);
+  const [visibleImgNeg, setVisibleImgNeg] = useState(false);
   const [visibleCorreo, setVisibleCorreo] = useState(false);
   const [campoSeleccionado, setCampoSeleccionado] = useState<any>(null);
   const [seccionActiva, setSeccionActiva] = useState<"personal" | "negocio">("personal");
 
   const user = usuario?.datosUsuario;
+  console.log('user',user);
+  
   const isDark = user?.estadoModo !== "1";
 
   const router = useRouter();
@@ -30,9 +39,14 @@ export default function Page() {
     router.push('/');
   };
 
-  const abrirDialogCampo = (campo: string) => {
-    setCampoSeleccionado({ campo });
+  const abrirDialogCampo = (campo: string, valor: string) => {
+    setCampoSeleccionado({ campo, valor });
     setVisibleCampos(true);
+  };
+
+  const abrirDialogNeg = (campo: string, valor: string) => {
+    setCampoSeleccionado({ campo,valor });
+    setVisibleNeg(true);
   };
 
   return (
@@ -55,7 +69,7 @@ export default function Page() {
         {/* Avatar */}
         <div className="relative">
           <Image
-            src={userImage}
+            src={user?.fotoPerfil ? `http://localhost:4000/uploads/${user.fotoPerfil}` : userImage}
             alt="user"
             width={170}
             height={170}
@@ -87,36 +101,39 @@ export default function Page() {
         </div>
         <div className="relative">
           <Image
-            src={logo}
+            src={user?.imagenTaller ? `http://localhost:4000/uploads/${user.imagenTaller}` : logoNeg}
             alt="user"
+            width={170}
+            height={170}
             className="w-full h-[180px] object-cover"
           />
         </div>
       </div>
+      {user?.idRol === 7 && (
+        <div className="flex gap-2 p-1 rounded-xl w-fit">
+          <Button
+            label="Información personal"
+            onClick={() => setSeccionActiva("personal")}
+            className={`px-5 py-2 rounded-lg text-md font-semibold transition-all duration-200 border-none
+              ${
+                seccionActiva === "personal"
+                  ? `${isDark ? "bg-[#1E293B] text-[#4F9CD7] shadow-md" : "bg-white text-[#4F9CD7] shadow-md"}`
+                  : `${isDark ? "bg-[#0F172A] text-gray-400 hover:bg-[#1E293B]" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`
+              }`}
+          />
 
-      <div className="flex gap-2 p-1 rounded-xl w-fit">
-        <Button
-          label="Información personal"
-          onClick={() => setSeccionActiva("personal")}
-          className={`px-5 py-2 rounded-lg text-md font-semibold transition-all duration-200 border-none
-            ${
-              seccionActiva === "personal"
-                ? `${isDark ? "bg-[#1E293B] text-[#4F9CD7] shadow-md" : "bg-white text-[#4F9CD7] shadow-md"}`
-                : `${isDark ? "bg-[#0F172A] text-gray-400 hover:bg-[#1E293B]" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`
-            }`}
-        />
-
-        <Button
-          label="Información del negocio"
-          onClick={() => setSeccionActiva("negocio")}
-          className={`px-5 py-2 rounded-lg text-md font-semibold transition-all duration-200 border-none
-            ${
-              seccionActiva === "negocio"
-                ? `${isDark ? "bg-[#1E293B] text-[#4F9CD7] shadow-md" : "bg-white text-[#4F9CD7] shadow-md"}`
-                : `${isDark ? "bg-[#0F172A] text-gray-400 hover:bg-[#1E293B]" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`
-            }`}
-        />
-      </div>
+          <Button
+            label="Información del negocio"
+            onClick={() => setSeccionActiva("negocio")}
+            className={`px-5 py-2 rounded-lg text-md font-semibold transition-all duration-200 border-none
+              ${
+                seccionActiva === "negocio"
+                  ? `${isDark ? "bg-[#1E293B] text-[#4F9CD7] shadow-md" : "bg-white text-[#4F9CD7] shadow-md"}`
+                  : `${isDark ? "bg-[#0F172A] text-gray-400 hover:bg-[#1E293B]" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`
+              }`}
+          />
+        </div>
+      )}
 
       {/* Información personal */}
       {seccionActiva === "personal" && (
@@ -126,67 +143,96 @@ export default function Page() {
             isDark ? "bg-[#1E293B] text-white" : "bg-white text-black"
           }`}
         >
-          <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
-            isDark ? "text-gray-300" : "text-gray-700"
-          }`}>
+          <div
+            className={`grid grid-cols-1 md:grid-cols-3 gap-4 ${
+              isDark ? "text-gray-300" : "text-gray-700"
+            }`}
+          >
+            {/* Imagen */}
+            <div className="flex justify-center md:justify-start">
+              <div className="relative inline-block">
+                <Image
+                  src={user?.fotoPerfil ? `http://localhost:4000/uploads/${user.fotoPerfil}` : userImage}
+                  alt="user"
+                  width={200}
+                  height={200}
+                  className="rounded-[10px] border-white shadow-md object-cover"
+                />
+
+                {/* Botón sobre la imagen */}
+                <Button
+                  icon="pi pi-pencil"
+                  className="!absolute top-1 right-1 bg-[#1E293B] text-[#4F9CD7] border-none shadow-md rounded-full w-8 h-8 flex items-center justify-center"
+                  onClick={() => setVisibleImg(true)}
+                />
+              </div>
+            </div>
+            <div>
+                {/* Nombre */}
+              <div>
+                <p className="text-sm text-gray-500">Nombre completo</p>
+                <div className="flex items-center gap-2">
+                  <p>{user?.nombres}</p>
+                  <Button
+                    icon="pi pi-pencil"
+                    className="bg-transparent border-transparent text-[#4F9CD7]"
+                    onClick={() => abrirDialogCampo("nombres",user?.nombres)}
+                  />
+                </div>
+              </div>
+
+              {/* Correo */}
+              <div>
+                <p className="text-sm text-gray-500">Correo</p>
+                <div className="flex items-center gap-2">
+                  {user?.correo ? (
+                    <>
+                      <p>{user?.correo}</p>
+                      <Button
+                        icon="pi pi-pencil"
+                        className="bg-transparent border-transparent text-[#4F9CD7]"
+                        onClick={() => abrirDialogCampo("correo",user?.correo)}
+                      />
+                    </>
+                  ) : (
+                    <Button
+                      label="Agregar Correo"
+                      className="text-[#4F9CD7] bg-transparent border-[#4F9CD7]"
+                      onClick={() => setVisibleCorreo(true)}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
             
             <div>
-              <p className="text-sm text-gray-500">Nombre completo</p>
-              <div className="flex items-center gap-2">
-                <p>{user?.nombres}</p>
-                <Button 
-                  icon='pi pi-pencil' 
-                  className="bg-transparent border-transparent text-[#4F9CD7]"
-                  onClick={() => abrirDialogCampo("nombres")}
-                />
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-500">Correo</p>
-              <div className="flex items-center gap-2">
-                {user?.correo ? (
-                  <>
-                    <p>{user?.correo}</p>
-                    <Button 
-                      icon='pi pi-pencil' 
-                      className="bg-transparent border-transparent text-[#4F9CD7]"
-                      onClick={() => abrirDialogCampo("correo")}
-                    />
-                  </>
-                ) : (
-                  <Button 
-                    label="Agregar Correo"
-                    className="text-[#4F9CD7] bg-transparent border-[#4F9CD7]"
-                    onClick={() => setVisibleCorreo(true)}
+                {/* Teléfono */}
+              <div>
+                <p className="text-sm text-gray-500">Teléfono</p>
+                <div className="flex items-center gap-2">
+                  <p>{user?.telefono}</p>
+                  <Button
+                    icon="pi pi-pencil"
+                    className="bg-transparent border-transparent text-[#4F9CD7]"
+                    onClick={() => abrirDialogCampo("telefono",user?.telefono)}
                   />
-                )}
+                </div>
               </div>
-            </div>
 
-            <div>
-              <p className="text-sm text-gray-500">Teléfono</p>
-              <div className="flex items-center gap-2">
-                <p>{user?.telefono}</p>
-                <Button 
-                  icon='pi pi-pencil' 
-                  className="bg-transparent border-transparent text-[#4F9CD7]"
-                  onClick={() => abrirDialogCampo("telefono")}
-                />
+              {/* Documento */}
+              <div>
+                <p className="text-sm text-gray-500">Documento</p>
+                <div className="flex items-center gap-2">
+                  <p>DNI: {user?.dni}</p>
+                  <Button
+                    icon="pi pi-pencil"
+                    className="bg-transparent border-transparent text-[#4F9CD7]"
+                    onClick={() => abrirDialogCampo("dni",user?.dni)}
+                  />
+                </div>
               </div>
             </div>
-
-            <div>
-              <p className="text-sm text-gray-500">Documento</p>
-              <div className="flex items-center gap-2">
-                <p>DNI: {user?.dni}</p>
-                <Button 
-                  icon='pi pi-pencil' 
-                  className="bg-transparent border-transparent text-[#4F9CD7]"
-                  onClick={() => abrirDialogCampo("dni")}
-                />
-              </div>
-            </div>
+            
           </div>
         </Card>
       )}
@@ -203,54 +249,60 @@ export default function Page() {
           <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
             isDark ? "text-gray-300" : "text-gray-700"
           }`}>
-            
+
+            <div className="flex justify-center md:justify-start">
+              <div className="relative inline-block">
+                <Image
+                  src={user?.imagenTaller ? `http://localhost:4000/uploads/${user.imagenTaller}` : logoNeg}
+                  alt="user"
+                  width={200}
+                  height={200}
+                  className="rounded-[10px] border-white shadow-md object-cover"
+                />
+
+                {/* Botón sobre la imagen */}
+                <Button
+                  icon="pi pi-pencil"
+                  className="!absolute top-1 right-1 bg-[#1E293B] text-[#4F9CD7] border-none shadow-md rounded-full w-8 h-8 flex items-center justify-center"
+                  onClick={() => setVisibleImgNeg(true)}
+                />
+              </div>
+            </div>
             <div>
               <p className="text-sm text-gray-500">Nombre Negocio</p>
               <div className="flex items-center gap-2">
-                <p>{user?.nombres}</p>
+                <p>{user?.nombreTaller}</p>
                 <Button 
                   icon='pi pi-pencil' 
                   className="bg-transparent border-transparent text-[#4F9CD7]"
-                  onClick={() => abrirDialogCampo("nombres")}
+                  onClick={() => abrirDialogNeg("nombre",user?.nombreTaller)}
                 />
               </div>
             </div>
-
             <div>
-              <p className="text-sm text-gray-500">RUC</p>
+              <p className="text-sm text-gray-500">Ruc</p>
               <div className="flex items-center gap-2">
-                {user?.correo ? (
-                  <>
-                    <p>{user?.correo}</p>
-                    <Button 
-                      icon='pi pi-pencil' 
-                      className="bg-transparent border-transparent text-[#4F9CD7]"
-                      onClick={() => abrirDialogCampo("correo")}
-                    />
-                  </>
-                ) : (
-                  <Button 
-                    label="Agregar Correo"
-                    className="text-[#4F9CD7] bg-transparent border-[#4F9CD7]"
-                    onClick={() => setVisibleCorreo(true)}
-                  />
-                )}
+                <p>{user?.ruc}</p>
+                <Button 
+                  icon='pi pi-pencil' 
+                  className="bg-transparent border-transparent text-[#4F9CD7]"
+                  onClick={() => abrirDialogNeg("ruc",user?.ruc)}
+                />
               </div>
             </div>
-
             <div>
               <p className="text-sm text-gray-500">Direccion</p>
               <div className="flex items-center gap-2">
-                <p>{user?.telefono}</p>
+                <p>{user?.direccion}</p>
                 <Button 
                   icon='pi pi-pencil' 
                   className="bg-transparent border-transparent text-[#4F9CD7]"
-                  onClick={() => abrirDialogCampo("telefono")}
+                  onClick={() => abrirDialogNeg("direccion",user?.direccion)}
                 />
               </div>
             </div>
 
-            <div>
+            {/* <div>
               <p className="text-sm text-gray-500">Numero de Contacto</p>
               <div className="flex items-center gap-2">
                 <p>DNI: {user?.dni}</p>
@@ -260,7 +312,7 @@ export default function Page() {
                   onClick={() => abrirDialogCampo("dni")}
                 />
               </div>
-            </div>
+            </div> */}
           </div>
         </Card>
       )}
@@ -285,7 +337,10 @@ export default function Page() {
       </div>
 
       <DialogCampos Open={visibleCampos} Close={() => setVisibleCampos(false)} Datos={campoSeleccionado} />
+      <DialogCamposNeg Open={visibleNeg} Close={()=> setVisibleNeg(false)} Datos={campoSeleccionado}/>
       <DialogCorreo Open={visibleCorreo} Close={() => setVisibleCorreo(false)} />
+      <DialogImage Open={visibleImg} Close={()=>setVisibleImg(false)}/>
+      <DialogImageNegocio Open={visibleImgNeg} Close={()=>setVisibleImgNeg(false)}/>
     </div>
   );
 }
